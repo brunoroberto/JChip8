@@ -1,7 +1,5 @@
 package com.github.brunoroberto.chip8.store;
 
-import com.github.brunoroberto.chip8.register.Register8;
-
 /**
  * Stack representation of the CHIP-8
  * 
@@ -10,21 +8,31 @@ import com.github.brunoroberto.chip8.register.Register8;
  */
 public class Stack {
 
-	private static final int STACK_SIZE = 0x10; // 16 default size
-
 	private short[] data;
-	private Register8 sp; // stack pointer register
-
-	public Stack() {
-		init(STACK_SIZE);
-	}
+	private short sp; // stack pointer register
 
 	public Stack(int stackSize) {
-		init(stackSize);
+		this.data = new short[stackSize];
+		this.sp = 0;
 	}
 
-	private void init(int stackSize) {
-		this.data = new short[stackSize];
-		this.sp = new Register8((byte) -1);
+	private boolean isFull() {
+		return this.sp == this.data.length;
+	}
+
+	private boolean isEmpty() {
+		return this.sp == 0;
+	}
+
+	public void put(short data) {
+		if (isFull())
+			throw new StackOverflowError("the stack is full");
+		this.data[this.sp++] = data;
+	}
+
+	public short pop() {
+		if (isEmpty())
+			throw new StackOverflowError("the stack is empty");
+		return this.data[this.sp--];
 	}
 }

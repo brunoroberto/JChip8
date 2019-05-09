@@ -1,4 +1,4 @@
-package com.github.brunoroberto.chip8;
+package com.github.brunoroberto.chip8.excep;
 
 public class FileExtensionException extends Exception {
 

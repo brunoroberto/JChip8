@@ -8,19 +8,9 @@ package com.github.brunoroberto.chip8.store;
  */
 public class Memory {
 
-	private static final int MEMORY_SIZE = 0x1000; // 4KB (4,096 bytes)
-
 	private byte[] memory;
 
-	public Memory() {
-		init(MEMORY_SIZE);
-	}
-
 	public Memory(int size) {
-		init(size);
-	}
-
-	private void init(int size) {
 		this.memory = new byte[size];
 	}
 

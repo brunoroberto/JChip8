@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 
+import com.github.brunoroberto.chip8.excep.FileExtensionException;
+
 public class Application {
 
 	private static boolean trace = Boolean.parseBoolean(System.getProperty("trace"));
@@ -49,6 +51,9 @@ public class Application {
 		} catch (IOException e) {
 			if (trace)
 				System.err.printf("Could not read bytes of the file - error: %s\n", e);
+		} catch (InterruptedException e) {
+			if (trace)
+				System.err.printf("Could not execute the rom - error: %s\n", e);
 		}
 	}
 
