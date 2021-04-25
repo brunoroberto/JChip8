@@ -1,64 +1,64 @@
 package com.github.brunoroberto.chip8;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import javax.swing.*;
+import java.awt.*;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.InvalidParameterException;
+import java.nio.file.Path;
 
-import com.github.brunoroberto.chip8.excep.FileExtensionException;
+public class Application extends JFrame {
 
-public class Application {
+    private static final String APPLICATION_NAME = "JCHIP-8";
 
-	private static boolean trace = Boolean.parseBoolean(System.getProperty("trace"));
+    private final Screen screen;
+    private final Dimension screenSize;
 
-	private static void printHelp() {
-		System.out.println("JChip8 Interpreter - by brunoroberto\n");
-		System.out.println("How to run:");
-		System.out.println("java -jar JChip8.jar filename.ch8");
-	}
+    private Application() {
+        super(APPLICATION_NAME);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-	private static void validateArgs(String... args) throws NullPointerException, InvalidParameterException {
-		if (args == null)
-			throw new NullPointerException("arguments cannot be null");
-		if (args.length != 1)
-			throw new InvalidParameterException("wrong number of arguments");
-	}
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        screenSize = toolkit.getScreenSize();
+        setSize(screenSize);
 
-	private static void validateFile(String fileName) throws FileNotFoundException, FileExtensionException {
-		File romFile = new File(fileName);
-		if (!romFile.exists())
-			throw new FileNotFoundException(String.format("%s not found", fileName));
-		if (!romFile.getAbsolutePath().endsWith(".ch8"))
-			throw new FileExtensionException("file must have .ch8 extension");
-	}
+        screen = new Screen();
+        screen.setBackground(Color.BLACK);
+        this.setBackground(Color.BLACK);
+        add(screen);
 
-	public static void start(String... args) {
-		try {
-			validateArgs(args);
-			validateFile(args[0]);
-		} catch (NullPointerException | InvalidParameterException | FileNotFoundException | FileExtensionException e) {
-			if (trace)
-				System.err.printf("Starting failed - error: %s\n", e);
-			printHelp();
-			return;
-		}
-		try {
-			byte[] bytes = Files.readAllBytes(Paths.get(args[0]));
-			Chip8 chip8 = new Chip8(bytes);
-			chip8.execute();
-		} catch (IOException e) {
-			if (trace)
-				System.err.printf("Could not read bytes of the file - error: %s\n", e);
-		} catch (InterruptedException e) {
-			if (trace)
-				System.err.printf("Could not execute the rom - error: %s\n", e);
-		}
-	}
+        setVisible(true);
+    }
 
-	public static void main(String[] args) {
-		Application.start(args);
-	}
+    public void start() {
+        try {
+            Path romPath = selectRomFile();
+            byte[] rom = Files.readAllBytes(romPath);
+
+            ScreenMemory screenMemory = new ScreenMemory(screenSize.getHeight());
+
+            Keyboard keyboard = new Keyboard();
+            this.addKeyListener(keyboard);
+
+            Chip8 chip8 = new Chip8(keyboard, screen, screenMemory);
+            chip8.execute(rom);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Path selectRomFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.removeChoosableFileFilter(fileChooser.getChoosableFileFilters()[0]);
+        fileChooser.addChoosableFileFilter(new RomFileFilter());
+        int state = fileChooser.showOpenDialog(this);
+        if (state != JFileChooser.APPROVE_OPTION) {
+            System.out.println("No ROM file selected");
+            System.exit(-1);
+        }
+        return fileChooser.getSelectedFile().toPath();
+    }
+
+    public static void main(String[] args) {
+        new Application().start();
+    }
 
 }
