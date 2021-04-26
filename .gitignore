@@ -31,3 +31,4 @@ bin/
 target/
 
 src/main/resources/
+.idea/

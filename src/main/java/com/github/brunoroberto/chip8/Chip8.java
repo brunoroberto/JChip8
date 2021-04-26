@@ -31,7 +31,7 @@ public class Chip8 {
     private static final int START_ADDRESS = 0x200; // 512
     private static final int CYCLE_PER_TICK = 10;
     private static final int V_REGISTER_SIZE = 16;
-    private static final int CPU_FREQUENCY = 1000 / 65; // 60Hz
+    private static final int CPU_FREQUENCY = 1000 / 60; // 60Hz
 
     private Memory memory;
     private Stack stack;
